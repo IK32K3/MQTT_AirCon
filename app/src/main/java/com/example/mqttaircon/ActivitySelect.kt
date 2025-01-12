@@ -17,7 +17,7 @@ class ActivitySelect : AppCompatActivity(){
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = AirConditionerAdapter(airConditionerList) { selectedAC ->
             // Chuyển tới giao diện điều khiển
-            val intent = Intent(this, ControlActivity::class.java)
+            val intent = Intent(this, ActivityControl::class.java)
             intent.putExtra("selectedAC", selectedAC)
             startActivity(intent)
         }

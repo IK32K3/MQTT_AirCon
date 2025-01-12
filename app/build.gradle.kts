@@ -45,6 +45,7 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.org.eclipse.paho.android.service)
     implementation(libs.paho.org.eclipse.paho.client.mqttv3)
+    implementation(libs.androidx.media3.common.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

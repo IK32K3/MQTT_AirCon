@@ -5,8 +5,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import org.eclipse.paho.android.service.MqttAndroidClient
-import org.eclipse.paho.client.mqttv3.IMqttActionListener
-import org.eclipse.paho.client.mqttv3.IMqttToken
 import org.eclipse.paho.client.mqttv3.MqttMessage
 
 class ActivityControl : AppCompatActivity(){
@@ -17,10 +15,8 @@ class ActivityControl : AppCompatActivity(){
 
     private lateinit var mqttClient: MqttAndroidClient
 
-    // MQTT Broker và topic
-    private val brokerUrl = "tcp://broker.emqx.io:1883"
-    private val topicCommand = "aircon/command"
-    private val topicStatus = "aircon/status"
+    private val topicCommand = "ac"
+    private var isPowerOn = false
 
     private var currentTemperature = 20 // Giá trị nhiệt độ hiện tại (giả định ban đầu)
 
@@ -38,20 +34,18 @@ class ActivityControl : AppCompatActivity(){
         updateTemperatureDisplay()
 
         // Khởi tạo MQTT Client
-        mqttClient = MqttAndroidClient(this, brokerUrl, "AndroidClient")
-
-        // Kết nối MQTT
-        connectToMqttBroker()
+        mqttClient = intent.getParcelableExtra<MqttAndroidClient>("MQTT_CLIENT")
+            ?: throw IllegalStateException("MQTT Client is missing")
 
         // Xử lý sự kiện cho các nút
         btnPower.setOnClickListener {
-            sendMqttCommand("TOGGLE_POWER")
+            togglePower()
         }
 
         btnTempUp.setOnClickListener {
             if (currentTemperature < 30) {
                 currentTemperature++
-                sendMqttCommand("TEMP_UP")
+                sendMqttCommand(currentTemperature.toString())
                 updateTemperatureDisplay()
             }
         }
@@ -59,26 +53,10 @@ class ActivityControl : AppCompatActivity(){
         btnTempDown.setOnClickListener {
             if (currentTemperature > 17) {
                 currentTemperature--
-                sendMqttCommand("TEMP_DOWN")
+                sendMqttCommand(currentTemperature.toString())
                 updateTemperatureDisplay()
             }
         }
-    }
-
-    private fun connectToMqttBroker() {
-        mqttClient.connect(null, object : IMqttActionListener {
-            override fun onSuccess(asyncActionToken: IMqttToken?) {
-                // Kết nối thành công
-                mqttClient.subscribe(topicStatus, 1) { _, message ->
-                    handleStatusUpdate(String(message.payload))
-                }
-            }
-
-            override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                // Kết nối thất bại
-                tvCurrentTemp.text = "Kết nối MQTT thất bại!"
-            }
-        })
     }
 
     private fun sendMqttCommand(command: String) {
@@ -86,20 +64,19 @@ class ActivityControl : AppCompatActivity(){
         mqttClient.publish(topicCommand, message)
     }
 
-    private fun handleStatusUpdate(status: String) {
-        // Cập nhật trạng thái từ ESP32 nếu cần
-        if (status.startsWith("TEMP:")) {
-            currentTemperature = status.removePrefix("TEMP:").toInt()
-            updateTemperatureDisplay()
-        }
-    }
-
     private fun updateTemperatureDisplay() {
         tvCurrentTemp.text = "Nhiệt độ hiện tại: $currentTemperature°C"
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mqttClient.disconnect()
+    private fun togglePower() {
+        isPowerOn = !isPowerOn
+        val command = if (isPowerOn) "on" else "off"
+        sendMqttCommand(command)
+        updatePowerDisplay()
+    }
+
+    private fun updatePowerDisplay() {
+        val powerState = if (isPowerOn) "Bật" else "Tắt"
+        btnPower.text = "Power: $powerState"
     }
 }
