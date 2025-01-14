@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.MqttMessage
 
 class ActivityControl : AppCompatActivity(){
@@ -13,7 +12,7 @@ class ActivityControl : AppCompatActivity(){
     private lateinit var btnTempUp: Button
     private lateinit var btnTempDown: Button
 
-    private lateinit var mqttClient: MqttAndroidClient
+    private var mqttClient = MqttClient.mqttClient
 
     private val topicCommand = "ac"
     private var isPowerOn = false
@@ -32,10 +31,6 @@ class ActivityControl : AppCompatActivity(){
 
         // Cập nhật nhiệt độ ban đầu
         updateTemperatureDisplay()
-
-        // Khởi tạo MQTT Client
-        mqttClient = intent.getParcelableExtra<MqttAndroidClient>("MQTT_CLIENT")
-            ?: throw IllegalStateException("MQTT Client is missing")
 
         // Xử lý sự kiện cho các nút
         btnPower.setOnClickListener {

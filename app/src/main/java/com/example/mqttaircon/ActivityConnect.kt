@@ -12,8 +12,8 @@ import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.MqttException
 
 class ActivityConnect : AppCompatActivity() {
-    private lateinit var mqttClient: MqttAndroidClient
     private val brokerUrl = "tcp://broker.emqx.io:1883" // Địa chỉ cố định
+    private val topic = "ac"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,23 +22,30 @@ class ActivityConnect : AppCompatActivity() {
         val tvStatus: TextView = findViewById(R.id.tv_status)
         val btnConnect: Button = findViewById(R.id.btn_connect)
 
+        // Tạo MQTT Client
+        initializeMqttClient(tvStatus)
+
         btnConnect.setOnClickListener {
             connectToBroker(tvStatus)
         }
     }
 
-    private fun connectToBroker(tvStatus: TextView) {
+    private fun initializeMqttClient(tvStatus: TextView) {
         val clientId = "AndroidClient_${System.currentTimeMillis()}"
-        mqttClient = MqttAndroidClient(applicationContext, brokerUrl, clientId)
+        MqttClient.mqttClient = MqttAndroidClient(applicationContext, brokerUrl, clientId)
+        tvStatus.text = "MQTT Client đã được khởi tạo."
+        Log.d("MQTT", "MQTT Client initialized with clientId: $clientId")
+    }
 
+    private fun connectToBroker(tvStatus: TextView) {
         try {
-            mqttClient.connect(null, object : IMqttActionListener {
+            MqttClient.mqttClient.connect(null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     tvStatus.text = "Kết nối thành công!"
                     Log.d("MQTT", "Connected to broker: $brokerUrl")
 
-                    // Subscribe to topic "ac"
-                    subscribeToTopic("ac", tvStatus)
+                    // Subscribe to topic sau khi kết nối thành công
+                    subscribeToTopic(tvStatus)
 
                     // Chuyển tới giao diện chọn điều hòa
                     startActivity(Intent(this@ActivityConnect, ActivitySelect::class.java))
@@ -50,13 +57,14 @@ class ActivityConnect : AppCompatActivity() {
                 }
             })
         } catch (e: MqttException) {
+            Log.e("MQTT", "Exception while connecting to broker", e)
             e.printStackTrace()
         }
     }
 
-    private fun subscribeToTopic(topic: String, tvStatus: TextView) {
+    private fun subscribeToTopic(tvStatus: TextView) {
         try {
-            mqttClient.subscribe(topic, 1, null, object : IMqttActionListener {
+            MqttClient.mqttClient.subscribe(topic, 1, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d("MQTT", "Subscribed to topic: $topic")
                     tvStatus.text = "Đã đăng ký topic: $topic"
