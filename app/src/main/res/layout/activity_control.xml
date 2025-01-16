@@ -1,47 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <!-- Trạng thái bật/tắt và nhiệt độ hiện tại -->
+    <TextView
+        android:id="@+id/tv_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Trạng thái: Tắt"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+         />
 
     <TextView
         android:id="@+id/tv_current_temp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nhiệt độ hiện tại: --°C"
+        android:text="Nhiệt độ hiện tại: 20°C"
         android:textSize="20sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_margin="32dp" />
+        android:textStyle="bold"
+        android:gravity="center"
+         />
 
-    <Button
-        android:id="@+id/btn_power"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Bật/Tắt"
-        app:layout_constraintTop_toBottomOf="@id/tv_current_temp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="32dp" />
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
 
-    <Button
-        android:id="@+id/btn_temp_up"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Tăng Nhiệt"
-        app:layout_constraintTop_toBottomOf="@id/btn_power"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="16dp" />
+        <Button
+            android:id="@+id/btn_power_on"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bật"
+            android:layout_marginEnd="8dp" />
 
-    <Button
-        android:id="@+id/btn_temp_down"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/btn_power_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tắt"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Giảm Nhiệt"
-        app:layout_constraintTop_toBottomOf="@id/btn_temp_up"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintMarginTop="16dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/btn_temp_up"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tăng"
+            android:layout_marginEnd="8dp" />
+
+        <Button
+            android:id="@+id/btn_temp_down"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Giảm"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+</LinearLayout>

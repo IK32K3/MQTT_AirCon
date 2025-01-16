@@ -4,75 +4,76 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import org.eclipse.paho.android.service.MqttAndroidClient
 import org.eclipse.paho.client.mqttv3.IMqttActionListener
 import org.eclipse.paho.client.mqttv3.IMqttToken
-import org.eclipse.paho.android.service.MqttAndroidClient
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions
 import org.eclipse.paho.client.mqttv3.MqttException
 
 class ActivityConnect : AppCompatActivity() {
-    private val brokerUrl = "tcp://broker.emqx.io:1883" // Địa chỉ cố định
+    private val brokerUrl = "tcp://broker.emqx.io:1883"
+    private val clientId = "AndroidClient"
     private val topic = "ac"
+    private val username = "emqx"
+    private val password = "public"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_connect)
 
-        val tvStatus: TextView = findViewById(R.id.tv_status)
         val btnConnect: Button = findViewById(R.id.btn_connect)
 
-        // Tạo MQTT Client
-        initializeMqttClient(tvStatus)
+        initializeMqttClient()
 
         btnConnect.setOnClickListener {
-            connectToBroker(tvStatus)
+            connectToBroker()
         }
     }
 
-    private fun initializeMqttClient(tvStatus: TextView) {
-        val clientId = "AndroidClient_${System.currentTimeMillis()}"
+    private fun initializeMqttClient() {
         MqttClient.mqttClient = MqttAndroidClient(applicationContext, brokerUrl, clientId)
-        tvStatus.text = "MQTT Client đã được khởi tạo."
         Log.d("MQTT", "MQTT Client initialized with clientId: $clientId")
     }
 
-    private fun connectToBroker(tvStatus: TextView) {
+    private fun connectToBroker() {
+        val options = MqttConnectOptions().apply {
+            userName = username
+            password = this@ActivityConnect.password.toCharArray()
+        }
+
         try {
-            MqttClient.mqttClient.connect(null, object : IMqttActionListener {
+            MqttClient.mqttClient.connect(options, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
-                    tvStatus.text = "Kết nối thành công!"
+                    Toast.makeText(this@ActivityConnect, "Kết nối thành công!", Toast.LENGTH_SHORT).show()
                     Log.d("MQTT", "Connected to broker: $brokerUrl")
 
-                    // Subscribe to topic sau khi kết nối thành công
-                    subscribeToTopic(tvStatus)
+                    subscribeToTopic()
 
-                    // Chuyển tới giao diện chọn điều hòa
                     startActivity(Intent(this@ActivityConnect, ActivitySelect::class.java))
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
-                    tvStatus.text = "Kết nối thất bại!"
+                    Toast.makeText(this@ActivityConnect, "Kết nối thất bại!", Toast.LENGTH_SHORT).show()
                     Log.e("MQTT", "Failed to connect to broker", exception)
                 }
             })
         } catch (e: MqttException) {
             Log.e("MQTT", "Exception while connecting to broker", e)
-            e.printStackTrace()
+            Toast.makeText(this, "Lỗi khi kết nối: ${e.message}", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun subscribeToTopic(tvStatus: TextView) {
+    private fun subscribeToTopic() {
         try {
             MqttClient.mqttClient.subscribe(topic, 1, null, object : IMqttActionListener {
                 override fun onSuccess(asyncActionToken: IMqttToken?) {
                     Log.d("MQTT", "Subscribed to topic: $topic")
-                    tvStatus.text = "Đã đăng ký topic: $topic"
                 }
 
                 override fun onFailure(asyncActionToken: IMqttToken?, exception: Throwable?) {
                     Log.e("MQTT", "Failed to subscribe to topic: $topic", exception)
-                    tvStatus.text = "Đăng ký topic thất bại: $topic"
                 }
             })
         } catch (e: MqttException) {

@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.mqttaircon"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.mqttaircon"
@@ -49,4 +49,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.androidx.localbroadcastmanager)
 }

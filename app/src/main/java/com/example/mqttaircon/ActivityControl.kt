@@ -8,16 +8,18 @@ import org.eclipse.paho.client.mqttv3.MqttMessage
 
 class ActivityControl : AppCompatActivity(){
     private lateinit var tvCurrentTemp: TextView
-    private lateinit var btnPower: Button
+    private lateinit var tvStatus: TextView
+    private lateinit var btnOn: Button
+    private lateinit var btnOff: Button
     private lateinit var btnTempUp: Button
     private lateinit var btnTempDown: Button
+
 
     private var mqttClient = MqttClient.mqttClient
 
     private val topicCommand = "ac"
-    private var isPowerOn = false
 
-    private var currentTemperature = 20 // Giá trị nhiệt độ hiện tại (giả định ban đầu)
+    private var currentTemperature = 20
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,7 +27,9 @@ class ActivityControl : AppCompatActivity(){
 
         // Ánh xạ view
         tvCurrentTemp = findViewById(R.id.tv_current_temp)
-        btnPower = findViewById(R.id.btn_power)
+        tvStatus = findViewById(R.id.tv_status)
+        btnOn = findViewById(R.id.btn_power_on)
+        btnOff = findViewById(R.id.btn_power_off)
         btnTempUp = findViewById(R.id.btn_temp_up)
         btnTempDown = findViewById(R.id.btn_temp_down)
 
@@ -33,8 +37,14 @@ class ActivityControl : AppCompatActivity(){
         updateTemperatureDisplay()
 
         // Xử lý sự kiện cho các nút
-        btnPower.setOnClickListener {
-            togglePower()
+        btnOn.setOnClickListener {
+            sendMqttCommand("on")
+            tvStatus.text = "Trạng thái: Bật"
+        }
+
+        btnOff.setOnClickListener{
+            sendMqttCommand("off")
+            tvStatus.text = "Trạng thái: Tắt"
         }
 
         btnTempUp.setOnClickListener {
@@ -63,15 +73,4 @@ class ActivityControl : AppCompatActivity(){
         tvCurrentTemp.text = "Nhiệt độ hiện tại: $currentTemperature°C"
     }
 
-    private fun togglePower() {
-        isPowerOn = !isPowerOn
-        val command = if (isPowerOn) "on" else "off"
-        sendMqttCommand(command)
-        updatePowerDisplay()
-    }
-
-    private fun updatePowerDisplay() {
-        val powerState = if (isPowerOn) "Bật" else "Tắt"
-        btnPower.text = "Power: $powerState"
-    }
 }

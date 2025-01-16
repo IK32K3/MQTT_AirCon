@@ -1,38 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
 
+    <!-- TextView hiển thị trạng thái kết nối -->
     <TextView
         android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Trạng thái: Chưa kết nối"
+        android:text="Nhấn nút để kết nối"
         android:textSize="18sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_marginTop="32dp" />
+        android:gravity="center"
+        android:padding="16dp" />
 
-    <TextView
-        android:id="@+id/tv_broker_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Broker: tcp://broker.emqx.io:1883"
-        android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tv_status"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_marginTop="16dp" />
-
+    <!-- Nút kết nối -->
     <Button
         android:id="@+id/btn_connect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Kết nối"
-        app:layout_constraintTop_toBottomOf="@id/tv_broker_info"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_marginTop="32dp" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:textSize="16sp" />
+</LinearLayout>
